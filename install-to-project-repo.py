@@ -207,9 +207,9 @@ parser.add_option("-d", "--delete",
 
 
 parsings = (
-  [(path, parse_interactively(path)) for path in jars("lib")]
+  [(path, parse_interactively(path)) for path in jars("plugins")]
   if options.interactive else
-  [(path, parse_by_eclipse_standard(path)) for path in jars("lib")]
+  [(path, parse_by_eclipse_standard(path)) for path in jars("plugins")]
 )
 
 unparsable_files = [r[0] for r in parsings if r[1] == None]
