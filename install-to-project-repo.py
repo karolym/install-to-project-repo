@@ -80,6 +80,18 @@ def install(path, parsing):
   )
 
 
+def deploy(path, parsing):
+  os.system(
+    "mvn deploy:deploy-file" + \
+    " -Dfile=" + path + \
+    " -DgroupId=" + parsing["group"] + \
+    " -DartifactId=" + parsing["name"] + \
+    " -Dversion=" + parsing["version"] + ("-SNAPSHOT" if parsing["snapshot"] else "") + \
+    " -DrepositoryId=" + options.id + \
+    " -Durl=" + options.url
+  )
+
+
 def splits(str, splitter):
   parts = str.split(splitter)
   def split(i):
@@ -203,6 +215,15 @@ parser.add_option("-i", "--interactive",
 parser.add_option("-d", "--delete", 
                   dest="delete", action="store_true", default=False, 
                   help="Delete successfully installed libs in source location")
+parser.add_option("--deploy", 
+                  dest="deploy", action="store_true", default=False, 
+                  help="Deploy to remote instead of local repo")
+parser.add_option("--url", 
+                  dest="url",
+                  help="URL of remote repo")
+parser.add_option("--id", 
+                  dest="id", 
+                  help="ID of repo in settings.xml")                  
 (options, args) = parser.parse_args()
 
 
@@ -222,8 +243,11 @@ if unparsable_files:
 parsings = [p for p in parsings if p[1] != None]
 
 for (path, parsing) in parsings:
-  install(path, parsing)
-  if options.delete:
-    os.remove(path)
+    if options.deploy:
+        deploy(path, parsing)
+    else:
+        install(path, parsing)
+    if options.delete:
+        os.remove(path)
 
 print(maven_dependencies(parsings))
